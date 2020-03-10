@@ -26,9 +26,9 @@ We have following search engines available
 Simple string search
 
 - RegexSearch
-  Regex search with wildcard example: `"carrout soup" => "(?ism)carrot.*?soup"`
+  Regex search with wildcard example: `"carrot soup" => "(?ism)carrot.*?soup"`
 - ExactRegexSearch
-  Simple Regex search example: `"carrout soup" => "(?ism)carrot soup"`
+  Simple Regex search example: `"carrot soup" => "(?ism)carrot soup"`
 - BoyerMooreHoopsterSearch
   Find needle position in haystack using Boyer Moore Hoopster algorithm [link here](https://en.wikipedia.org/wiki/Boyer%E2%80%93Moore%E2%80%93Horspool_algorithm "Boyer Moore Horspool Algorithm")
       
