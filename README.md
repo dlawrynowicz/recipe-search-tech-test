@@ -1,40 +1,70 @@
-## Recipe search
+# Recipe search
 
-We have to give users the ability to search for recipes. We have some text files containing recipe descriptions written in English. We would like to be able to search over the set of these text files to find recipes given at a minimum a single word e.g. `tomato`.
+For purpose of this exercise I've created different SearchEngines so we can compare each solution easily.
+From my previous experience working with recipies, I think that counting occurance of each word is not the best approach in terms of searching recipiesthis kind of texts.
+Looking separatly at title and the rest of the recipe (title with high relevancy, content lower) works as expected.
+Provided search solution allows us to even search for recipies using list of ingredients (InvertedIndexSearch and RegexSearch) like so `(search-recipe "onion carrot potato")`
 
-Example text files: [recipes.zip](https://media.riverford.co.uk/downloads/hiring/sse/recipes.zip)
+We cannot be sure about recipies structure, so for the sake of this exercise I assumed that first line is a recipe title, and the rest is the recipe itself. 
 
-We would like a program that can provide a search function over these files, each search returning a small number (e.g around 1-10) relevant recipes if possible.
+## Usage
 
-The text files are of differing sizes, and are encoded as utf-8. New text files are coming in all the time, so we should not assume a static set of recipes.
+1. Start REPL
+2. Load `core.clj`
+3. Call `init` to load recipe files and to initialize indexes
+3. Call `search-recipe`
+4. See results as maps
 
-The name of each file is considered the id of the recipe.
+Example calls:
+`(search-recipe "carrot soup")`
+`(search-recipe "potato soup" 30)`
 
-Our requirements have been listed by a key business stakeholder:
+## Search Engines
+We have following search engines available
 
-## Essential requirements:
+### String search
+Simple string search
 
--	Search results should be relevant, e.g. a search for broccoli stilton soup should return at least broccoli stilton soup.
--	Searches should complete quickly so users are not kept waiting – this tool needs to serve many users so lower latency will mean we can serve more concurrent searches - ideally searches will take < 10ms.
+- RegexSearch
+  Regex search with wildcard example: `"carrout soup" => "(?ism)carrot.*?soup"`
+- ExactRegexSearch
+  Simple Regex search example: `"carrout soup" => "(?ism)carrot soup"`
+- BoyerMooreHoopsterSearch
+  Find needle position in haystack using Boyer Moore Hoopster algorithm [link here](https://en.wikipedia.org/wiki/Boyer%E2%80%93Moore%E2%80%93Horspool_algorithm "Boyer Moore Horspool Algorithm")
+      
+### Indexed search
+- InvertedIndexesSearch
+  Most efficient way of searching. Breaks down all recipes by words and creates inverted index.
+  Search is done using matching on sets [link here](https://en.wikipedia.org/wiki/Inverted_index "Inverted Index")
 
-Ideally the results will be sorted so that the most relevant result is first in the result list.
 
-## Technical Notes
+## TODO
+Future work could include
 
-The program can be a command line app, a set of functions for REPL usage or a web app. It can be written in any language you want.
+- Refactor
+- More tests
+- Seek feedback
+- For inverted engine, we could make sure that every word is singular, so it will provide even better search results
+- Docker file and http interface to use as a service
+- Extract ingredients from recipes
+- autoload new recipies - dirwatch
 
-The goal of this test is to appraise your programming ability, that is to say – how simple, readable, efficient and correct your solution is. In addition good comments, good function/interface design and good naming will be looked for.
+In real world we could use Lucene or Elastic/ElasticSearch
 
-We have left the level of sophistication up to you, we find it is easier to make a naïve solution obviously simple, but as things get more sophisticated, keeping it simple is more challenging. We are interested in how you can do ‘hard’ things in a simple way.
+## Tests
+Few simple tests in `/test`
 
--	Returning relevant results is fairly open ended and subjective, so there is a lot of room for increasing sophistication. 
--	Performance / Resource utilisation is another area where you can apply more sophistication to the solution.
--	Degree to which the solution is generalized without loss of clarity is another.
+Acceptance criteria test is in `core_test.clj` - long one, build inverted index
 
-Because we are trying to appraise your programming ability and initiative, be reasonable in your use of libraries or existing search tools – In this test we really *do* want you to reinvent the wheel as far as the core problem is concerned! So just using `grep` will not win you many points. Feel free to use established techniques and algorithms, in fact this is encouraged.
+## Benchmark
+Simple banchmark using `time` function
 
-You can spend as long or as little as you would like on the test, it does not have to be perfect! I think anywhere from 2-6 hours would be appropriate.
+1. Start REPL
+2. Load `core.clj`
+3. Call `init` to load recipe files and to initialize indexes
+3. Call `test-search-recipe`
+4. See compared results
 
-Please host the program source on github.com (e.g by forking this repo), gitlab.com or provide a link to a zip file on google drive. Let me know you’ve done it by sending a link to danielstone@riverford.co.uk
-
-Good luck!
+Example calls:
+`(test-search-recipe "carrot")`
+`(test-search-recipe "potato soup" 30)`
